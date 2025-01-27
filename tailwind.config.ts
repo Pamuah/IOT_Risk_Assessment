@@ -11,8 +11,14 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        beige: "#f0e7d7", // Define the beige color here
+        almond: "#e9ecee", // Define the almond color here
+      },
+      fontFamily: {
+        inter: ["Inter", "sans-serif"], // Add Inter to Tailwind
       },
     },
   },
-  plugins: [],
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  plugins: [require("daisyui")],
 } satisfies Config;
