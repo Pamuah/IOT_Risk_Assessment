@@ -1,9 +1,18 @@
+"use client";
 import React from "react";
 import CustomCard from "./components/customcard";
 import CustomSearch from "./components/search";
 import RadarChart from "./components/RadarChart";
+import { useState } from "react";
+import { User, Users } from "../list";
+import Table from "./components/Table";
 
 const UsersPage = () => {
+  const [users, setUsers] = useState("");
+  const SearchFunction = (data: User[]) => {
+    return data.filter((item) => item.first_name.toLowerCase().includes(users));
+  };
+  console.log(users);
   return (
     <div className="bg-white min-h-screen w-full flex flex-col">
       {/* Background image section */}
@@ -55,8 +64,10 @@ const UsersPage = () => {
       {/* Main content section */}
       <div className="flex flex-col items-center justify-start flex-grow w-full mt-20">
         {/* Custom Search */}
-        <div className="w-full flex justify-center mb-8 mt-16">
-          <CustomSearch />
+        <div className="w-full flex flex-col items-center justify-center mb-8 mt-16">
+          <CustomSearch onChange={(e) => setUsers(e.target.value)} />
+
+          <Table data={SearchFunction(Users)} />
         </div>
 
         {/* Radar Chart */}
