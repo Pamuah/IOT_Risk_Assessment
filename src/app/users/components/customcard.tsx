@@ -16,7 +16,7 @@ const CustomCard: React.FC<CustomCardProps> = ({
 }) => {
   return (
     <div
-      className={` w-64 h-40 ${backgroundColor} shadow-lg rounded-lg p-4 ${hoverColor} mr-4`}
+      className={` w-64 h-40 ${backgroundColor} shadow-lg rounded-lg p-4 ${hoverColor} mr-4 mb-4`}
     >
       {/* Image in the top-left corner */}
       <Image
