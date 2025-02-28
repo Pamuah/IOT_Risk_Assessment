@@ -8,6 +8,10 @@ import BarChart from "./components/BarChart";
 import Link from "next/link";
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
 import { sendControlData } from "./ApiServices";
+import RiskTable from "./components/RiskTable";
+import RadarChart from "./components/RadarChart";
+import Static_Radar from "./components/DynamicRadar";
+import Cvss_BarChart from "./components/cvss_Barchart";
 
 interface ApiResponse {
   message: string;
@@ -15,6 +19,7 @@ interface ApiResponse {
   risk_frequencies: Record<string, number>; // e.g. { "buffer error": 440 }
   average_cvss_scores: Record<string, number | null>; // e.g. { "buffer error": 8.24, "denial of service": null }
 }
+
 const UsersPage = () => {
   const [rows, setRows] = useState([
     {
@@ -124,11 +129,56 @@ const UsersPage = () => {
 
       {/* Main content section */}
       <div className="flex flex-col items-center justify-start flex-grow w-full mt-20">
+        {/* Static First Row */}
+        <div className="flex flex-row items-start justify-center w-full gap-6 border p-4 rounded-lg shadow-md ">
+          <CustomInput
+            label="Control ID"
+            width="w-40"
+            height="h-10"
+            hints="Ctrl-Id"
+            Value={rows[0].control_id}
+            onChange={(e) => handleInputChange(0, "control_id", e.target.value)}
+          />
+          <CustomInput
+            label="Sub Domain"
+            width="w-40"
+            height="h-10"
+            hints="eg: Secure wireless"
+            Value={rows[0].sub_domain}
+            onChange={(e) => handleInputChange(0, "sub_domain", e.target.value)}
+          />
+          <CustomInput
+            label="Domain"
+            width="w-40"
+            height="h-10"
+            hints="eg: Network layer"
+            Value={rows[0].domain}
+            onChange={(e) => handleInputChange(0, "domain", e.target.value)}
+          />
+          <CustomInput
+            label="Potential Risk"
+            width="w-40"
+            height="h-10"
+            hints="eg: Denial of service"
+            Value={rows[0].potential_risks}
+            onChange={(e) =>
+              handleInputChange(0, "potential_risks", e.target.value)
+            }
+          />
+          <Dropdown
+            label="Initial Control Grading"
+            selectedValue={rows[0].initial_control_grading}
+            onSelect={(value) =>
+              handleInputChange(0, "initial_control_grading", value)
+            }
+          />
+        </div>
+
         {/* Dynamic Input Rows */}
-        {rows.map((row, index) => (
+        {rows.slice(1).map((row, index) => (
           <div
-            key={index}
-            className="flex flex-row items-start justify-center w-full gap-6 border p-4 rounded-lg shadow-md"
+            key={index + 1}
+            className="ml-7 flex flex-row items-start justify-center w-full gap-6 border p-4 rounded-lg shadow-md"
           >
             <CustomInput
               label="Control ID"
@@ -137,7 +187,7 @@ const UsersPage = () => {
               hints="Ctrl-Id"
               Value={row.control_id}
               onChange={(e) =>
-                handleInputChange(index, "control_id", e.target.value)
+                handleInputChange(index + 1, "control_id", e.target.value)
               }
             />
             <CustomInput
@@ -147,7 +197,7 @@ const UsersPage = () => {
               hints="eg: Secure wireless"
               Value={row.sub_domain}
               onChange={(e) =>
-                handleInputChange(index, "sub_domain", e.target.value)
+                handleInputChange(index + 1, "sub_domain", e.target.value)
               }
             />
             <CustomInput
@@ -157,7 +207,7 @@ const UsersPage = () => {
               hints="eg: Network layer"
               Value={row.domain}
               onChange={(e) =>
-                handleInputChange(index, "domain", e.target.value)
+                handleInputChange(index + 1, "domain", e.target.value)
               }
             />
             <CustomInput
@@ -167,28 +217,28 @@ const UsersPage = () => {
               hints="eg: Denial of service"
               Value={row.potential_risks}
               onChange={(e) =>
-                handleInputChange(index, "potential_risks", e.target.value)
+                handleInputChange(index + 1, "potential_risks", e.target.value)
               }
             />
             <Dropdown
               label="Initial Control Grading"
-              selectedValue={row.initial_control_grading} // ✅ Pass state
+              selectedValue={row.initial_control_grading}
               onSelect={(value) =>
-                handleInputChange(index, "initial_control_grading", value)
-              } // ✅ Update state when selected
+                handleInputChange(index + 1, "initial_control_grading", value)
+              }
             />
 
-            {/* Remove Button (Disabled for first row) */}
-            {index !== 0 && (
-              <button
-                onClick={() => removeRow(index)}
-                className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-700"
-              >
-                <AiOutlineMinus size={20} />
-              </button>
-            )}
+            {/* Remove Button */}
+            <button
+              onClick={() => removeRow(index + 1)}
+              className="px-1 bg-red-500 text-white rounded-lg hover:bg-red-700"
+            >
+              <AiOutlineMinus size={20} />
+            </button>
           </div>
         ))}
+      </div>
+      <div className="flex flex-col items-center justify-center">
         <CustomInput
           label="No. of Monte-Carlo Sim"
           width="w-40"
@@ -197,24 +247,26 @@ const UsersPage = () => {
           Value={numSim.toString()}
           onChange={(e) => setNumSim(Number(e.target.value) || 0)}
         />
-        {/* Add Row Button */}
-        <div className="flex flex-row items-center justify-center gap-3">
-          <button
-            onClick={addRow}
-            className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 mt-4"
-          >
-            <AiOutlinePlus size={20} /> Add Row
-          </button>
+      </div>
 
-          <button
-            onClick={handleSubmit}
-            className="mt-4 p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-700"
-          >
-            Submit Data
-          </button>
-        </div>
+      {/* Add Row Button */}
+      <div className="flex flex-row items-center justify-center gap-3">
+        <button
+          onClick={addRow}
+          className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 mt-4"
+        >
+          <AiOutlinePlus size={20} /> Add Row
+        </button>
 
-        {/* Radar Chart 
+        <button
+          onClick={handleSubmit}
+          className="mt-4 p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-700"
+        >
+          Submit Data
+        </button>
+      </div>
+
+      {/* Radar Chart 
         <h5 className="text-xl font-semibold text-gray-600 font-inter mt-4 mb-2">
           Security Assessment
         </h5>
@@ -223,32 +275,81 @@ const UsersPage = () => {
           <RadarChart />
         </div>
 */}
-        {/* Monte Carlo Simulation */}
+      {/* Monte Carlo Simulation */}
+      <div className="flex flex-col items-center justify-center">
         <h5 className="text-xl font-semibold text-gray-600 font-inter mt-8">
           Monte Carlo Simulation
         </h5>
-        <div className="w-full h-[500px] flex flex-row items-start justify-start rounded-lg shadow-md p-5 gap-4 mx-4">
-          <BarChart
-            response={
-              apiResponse || {
+      </div>
+
+      <div className="w-full h-[500px] flex flex-row items-start justify-start rounded-lg shadow-md p-5 gap-4 mx-4">
+        <BarChart
+          response={
+            apiResponse || {
+              message: "",
+              batch_id: 0,
+              risk_frequencies: {},
+              average_cvss_scores: {},
+            }
+          }
+        />
+
+        <Cvss_BarChart
+          response={
+            apiResponse || {
+              message: "",
+              batch_id: 0,
+              risk_frequencies: {},
+              average_cvss_scores: {},
+            }
+          }
+        />
+      </div>
+      {/* Displaying the Radar chart */}
+      <div className="flex flex-col pt-2 items-center justify-center mt-3">
+        <h6 className="text-4xl font-semibold text-slate-800 font-inter mb-1 mt-3">
+          Radar Chart
+        </h6>
+        <div className="w-full h-[500px] flex flex-row items-start justify-start rounded-lg shadow-md p-5 gap-4 mx-1">
+          <RadarChart
+            apiData={
+              (apiResponse ?? {
                 message: "",
                 batch_id: 0,
                 risk_frequencies: {},
                 average_cvss_scores: {},
-              }
+                User_entries: [],
+              }) as ApiResponse
             }
           />
 
-          {/* <BarChart /> */}
+          <Static_Radar apiData={apiResponse ?? null} />
         </div>
       </div>
-      <div className="flex flex-row items-end justify-end mt-4 mr-2">
-        <Link
-          className="text-lg font-semibold text-blue-600 underline italic font-inter"
-          href="/vulnerability"
-        >
-          view Risk Assessment list
-        </Link>
+
+      <div className="flex flex-row pt-2">
+        <h6 className="text-4xl font-semibold text-slate-800 font-inter mb-1 mt-3">
+          Risk Assessment
+        </h6>
+        {/* <Link
+            href="/users"
+            className="text-slate-800 flex items-center justify-end ml-20 space-x-2"
+          >
+            <IoArrowForward className="text-2xl" />
+          </Link> */}
+      </div>
+      <div className="h-full w-full relative p-5 rounded-lg">
+        <RiskTable
+          apiData={
+            apiResponse ?? {
+              message: "",
+              batch_id: 0,
+              risk_frequencies: {},
+              average_cvss_scores: {},
+              User_entries: [],
+            }
+          }
+        />
       </div>
     </div>
   );

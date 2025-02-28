@@ -1,38 +1,73 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const options = ["Abort", "Accept", "Decline"];
 
-const initialData = [
-  {
-    id: 1,
-    domain: "IoT Security",
-    controlId: "CTRL-001",
-    subDomain: "Network Security",
-    potentialRisk: "Unauthorized Access",
-    initialControlGrading: "High",
-    ctrlImpactScore: 8,
-    likelihood: "Medium",
-    riskTreatment: "Accept",
-    newControlGrading: "Medium",
-  },
-  {
-    id: 2,
-    domain: "IoT Privacy",
-    controlId: "CTRL-002",
-    subDomain: "Data Protection",
-    potentialRisk: "Data Breach",
-    initialControlGrading: "Critical",
-    ctrlImpactScore: 9,
-    likelihood: "High",
-    riskTreatment: "Decline",
-    newControlGrading: "Low",
-  },
-];
+interface UserEntry {
+  control_id: string;
+  sub_domain: string;
+  domain: string;
+  initial_control_grading: number;
+  potential_risks: string;
+  initial_domain_score: number;
+  ideal_situation: number;
+}
 
-const RiskTable = () => {
-  const [tableData, setTableData] = useState(initialData);
+interface TableResponse {
+  message: string;
+  batch_id: number;
+  risk_frequencies: Record<string, number | null>;
+  average_cvss_scores: Record<string, number | null>;
+  User_entries?: UserEntry[];
+}
+
+interface TableRow {
+  id: number;
+  domain: string;
+  controlId: string;
+  subDomain: string;
+  potentialRisk: string;
+  initialControlGrading: number;
+  initialDomainScore: number;
+  idealSituation: number;
+  ctrlImpactScore: number | string;
+  likelihood: number | string;
+  riskTreatment: string;
+  newControlGrading: string;
+}
+
+const RiskTable = ({ apiData }: { apiData: TableResponse }) => {
+  const [tableData, setTableData] = useState<TableRow[]>([]);
+
+  useEffect(() => {
+    if (apiData && apiData.User_entries) {
+      const transformedScores: Record<string, number> = {};
+      Object.keys(apiData.average_cvss_scores).forEach((key) => {
+        transformedScores[key] = apiData.average_cvss_scores[key] ?? 0;
+      });
+
+      const formattedData: TableRow[] = apiData.User_entries.map(
+        (entry, index) => ({
+          id: index + 1,
+          domain: entry.domain,
+          controlId: entry.control_id,
+          subDomain: entry.sub_domain,
+          potentialRisk: entry.potential_risks,
+          initialControlGrading: entry.initial_control_grading,
+          initialDomainScore: entry.initial_domain_score,
+          idealSituation: entry.ideal_situation,
+          ctrlImpactScore: transformedScores[entry.potential_risks] ?? "N/A",
+          likelihood:
+            apiData.risk_frequencies[entry.potential_risks] ?? "Unknown",
+          riskTreatment: "Accept",
+          newControlGrading: "Pending",
+        })
+      );
+
+      setTableData(formattedData);
+    }
+  }, [apiData]);
 
   const handleChange = (id: number, value: string) => {
     setTableData((prev) =>
@@ -53,6 +88,8 @@ const RiskTable = () => {
             <th className="border p-2">Sub Domain</th>
             <th className="border p-2">Potential Risk</th>
             <th className="border p-2">Initial Control Grading</th>
+            <th className="border p-2">Initial Domain Score</th>
+            <th className="border p-2">Ideal Situation</th>
             <th className="border p-2">Ctrl Impact Score</th>
             <th className="border p-2">Likelihood</th>
             <th className="border p-2">Risk Treatment</th>
@@ -68,6 +105,8 @@ const RiskTable = () => {
               <td className="border p-2">{row.subDomain}</td>
               <td className="border p-2">{row.potentialRisk}</td>
               <td className="border p-2">{row.initialControlGrading}</td>
+              <td className="border p-2">{row.initialDomainScore}</td>
+              <td className="border p-2">{row.idealSituation}</td>
               <td className="border p-2">{row.ctrlImpactScore}</td>
               <td className="border p-2">{row.likelihood}</td>
               <td className="border p-2">

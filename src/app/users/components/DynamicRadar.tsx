@@ -19,7 +19,9 @@ interface ApiResponse {
   User_entries?: UserEntry[];
 }
 
-const RadarChart: React.FC<{ apiData: ApiResponse | null }> = ({ apiData }) => {
+const Static_Radar: React.FC<{ apiData: ApiResponse | null }> = ({
+  apiData,
+}) => {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
@@ -29,7 +31,6 @@ const RadarChart: React.FC<{ apiData: ApiResponse | null }> = ({ apiData }) => {
       weight: Math.min(4, entry.initial_control_grading), // Ensure it does not exceed 4
     })) || [];
 
-  const controlScores = chartData.map((item) => item.weight);
   const variableScores = chartData.map((item) => Math.min(4, item.weight + 1)); // Ensure max 4
   const idealSituation = chartData.map(() => 4); // Set all to max (4)
 
@@ -50,21 +51,12 @@ const RadarChart: React.FC<{ apiData: ApiResponse | null }> = ({ apiData }) => {
               {
                 label: "Ideal Situation",
                 data: idealSituation,
-                //    backgroundColor: "rgba(255, 165, 0, 0.2)",
                 borderColor: "rgba(255, 165, 0, 0.5)",
-                borderWidth: 2,
-              },
-              {
-                label: "Control Score",
-                data: controlScores,
-                //  backgroundColor: "rgba(0, 0, 255, 0.1)",
-                borderColor: "rgba(0, 0, 255, 0.7)",
                 borderWidth: 2,
               },
               {
                 label: "Variable Score",
                 data: variableScores,
-                //  backgroundColor: "rgba(0, 165, 0, 0.2)",
                 borderColor: "rgba(0, 165, 0, 0.5)",
                 borderWidth: 2,
               },
@@ -116,4 +108,4 @@ const RadarChart: React.FC<{ apiData: ApiResponse | null }> = ({ apiData }) => {
   );
 };
 
-export default RadarChart;
+export default Static_Radar;

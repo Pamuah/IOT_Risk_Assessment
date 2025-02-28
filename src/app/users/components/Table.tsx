@@ -15,11 +15,14 @@ const TableComponent: React.FC<TableComponentProps> = ({ data }) => {
       <table className="table table-zebra">
         <thead>
           <tr className="bg-gray-200 text-gray-700">
-            <th>Variot id</th>
-            <th>Title</th>
-            <th>Sub Category</th>
-            <th>Cvss Score</th>
-            <th>Severity</th>
+            <th>IoT Dev Domain</th>
+            <th>Control Id</th>
+            <th>Sub Domain</th>
+            <th>Potential Risk</th>
+            <th>Initial Control Grading</th>
+            <th>Ctrl impact Score</th>
+            <th>Likelihood</th>
+            <th>Risk Treatment</th>
           </tr>
         </thead>
         <tbody>

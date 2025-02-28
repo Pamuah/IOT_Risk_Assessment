@@ -6,17 +6,27 @@ import { Chart } from "chart.js/auto";
 interface RiskResponse {
   message: string;
   batch_id: number;
-  risk_frequencies: Record<string, number>; // Dynamic keys with number values
-  average_cvss_scores: Record<string, number | null>; // Dynamic keys with number values
+  risk_frequencies: Record<string, number>;
+  average_cvss_scores: Record<string, number | null>;
+  User_entries?: {
+    control_id: string;
+    sub_domain: string;
+    domain: string;
+    initial_control_grading: number;
+    potential_risks: string;
+  }[];
 }
 
-const BarChart = ({ response }: { response: RiskResponse }) => {
+const Cvss_BarChart = ({ response }: { response: RiskResponse }) => {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
-  // Extract data dynamically from the response
-  const riskLabels = Object.keys(response.risk_frequencies); // Risk names as x-axis labels
-  const riskFrequencies = Object.values(response.risk_frequencies); // Frequencies as y-axis values
+  // Extracting potential risks and corresponding average CVSS scores
+  const potentialRisks =
+    response.User_entries?.map((entry) => entry.potential_risks) || [];
+  const avgCvssScores = potentialRisks.map(
+    (risk) => response.average_cvss_scores[risk] || 0
+  );
 
   useEffect(() => {
     if (chartRef.current) {
@@ -30,13 +40,13 @@ const BarChart = ({ response }: { response: RiskResponse }) => {
         chartInstanceRef.current = new Chart(context, {
           type: "bar",
           data: {
-            labels: riskLabels, // Use risk categories as x-axis labels
+            labels: potentialRisks,
             datasets: [
               {
-                label: "Risk Frequency",
-                data: riskFrequencies, // Use frequency as y-axis values
-                backgroundColor: "rgba(75, 192, 192, 0.6)",
-                borderColor: "rgba(75, 192, 192, 1)",
+                label: "Avg CVSS Score",
+                data: avgCvssScores,
+                backgroundColor: "rgba(255, 192, 192, 0.2)",
+                borderColor: "rgba(255, 192, 192, 01)",
                 borderWidth: 1,
                 borderRadius: 5,
                 barThickness: 50,
@@ -50,7 +60,7 @@ const BarChart = ({ response }: { response: RiskResponse }) => {
             plugins: {
               title: {
                 display: true,
-                text: "Distribution of Sub-Categories",
+                text: "Distribution of Avg CVSS Scores",
                 font: { size: 18, weight: "bold" },
               },
             },
@@ -87,4 +97,4 @@ const BarChart = ({ response }: { response: RiskResponse }) => {
   );
 };
 
-export default BarChart;
+export default Cvss_BarChart;
