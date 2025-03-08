@@ -2,8 +2,8 @@ import React, { useState } from "react";
 
 interface DropdownProps {
   label: string;
-  selectedValue: number; // 👈 Receive selected value from parent
-  onSelect: (value: number) => void; // 👈 Callback to update parent state
+  selectedValue: number;
+  onSelect: (value: number) => void;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -12,10 +12,21 @@ const Dropdown: React.FC<DropdownProps> = ({
   onSelect,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const options = [0, 1, 2, 3, 4]; // 👈 Ensure numbers are used
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const options = [0, 1, 2, 3, 4];
+
+  // Short descriptions for each number
+  const hoverTexts: Record<number, string> = {
+    0: "Not implemented",
+    1: "Hardly implemented",
+    2: "Moderately implemented",
+    3: "Fully implemented",
+    4: "Monitored and Governed",
+  };
 
   const handleSelect = (value: number) => {
-    onSelect(value); // 👈 Update state in parent
+    onSelect(value);
     setIsOpen(false);
   };
 
@@ -31,20 +42,29 @@ const Dropdown: React.FC<DropdownProps> = ({
                    focus:ring-2 focus:ring-slate-700 flex justify-between items-center"
         onClick={() => setIsOpen(!isOpen)}
       >
-        {selectedValue} {/* 👈 Use parent state instead of local state */}
+        {selectedValue}
         <span className="text-gray-500">&#9662;</span> {/* Down Arrow */}
       </button>
 
       {/* Dropdown List */}
       {isOpen && (
         <ul className="absolute w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-10 text-gray-600">
-          {options.map((option, index) => (
+          {options.map((option) => (
             <li
-              key={index}
-              className="p-3 hover:bg-slate-500 cursor-pointer"
+              key={option}
+              className="p-3 hover:bg-slate-500 cursor-pointer relative"
               onClick={() => handleSelect(option)}
+              onMouseEnter={() => setHoveredIndex(option)}
+              onMouseLeave={() => setHoveredIndex(null)}
             >
               {option}
+
+              {/* Hover Text Display */}
+              {hoveredIndex === option && (
+                <div className="absolute left-full ml-3 px-3 py-1 text-xs bg-black text-white rounded shadow-md">
+                  {hoverTexts[option]}
+                </div>
+              )}
             </li>
           ))}
         </ul>

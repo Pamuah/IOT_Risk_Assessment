@@ -49,13 +49,13 @@ const Static_Radar: React.FC<{ apiData: ApiResponse | null }> = ({
             labels: chartData.map((item) => item.label),
             datasets: [
               {
-                label: "Ideal Situation",
+                label: "CIoT,C",
                 data: idealSituation,
                 borderColor: "rgba(255, 165, 0, 0.5)",
                 borderWidth: 2,
               },
               {
-                label: "Variable Score",
+                label: "Initial BIoT,B Grading",
                 data: variableScores,
                 borderColor: "rgba(0, 165, 0, 0.5)",
                 borderWidth: 2,

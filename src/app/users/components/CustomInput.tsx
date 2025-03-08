@@ -13,7 +13,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
   width = "w-40",
   height = "h-10",
   hints,
-  onChange, // Fix: Add onChange as a prop
+  onChange,
   label,
   Value,
 }) => {
@@ -29,7 +29,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
                   text-gray-500 font-inter ${width} ${height}`}
         placeholder={hints}
         value={Value}
-        onChange={onChange} // Fix: Now correctly updates state
+        onChange={onChange}
       />
     </div>
   );

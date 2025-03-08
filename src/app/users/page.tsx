@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import CustomCard from "./components/customcard";
-//import RadarChart from "./components/RadarChart";
 import CustomInput from "./components/CustomInput";
 import Dropdown from "./components/Dropdown";
 import BarChart from "./components/BarChart";
@@ -23,6 +22,7 @@ interface ApiResponse {
 const UsersPage = () => {
   const [rows, setRows] = useState([
     {
+      control: "",
       control_id: "",
       sub_domain: "",
       domain: "",
@@ -49,6 +49,7 @@ const UsersPage = () => {
     setRows([
       ...rows,
       {
+        control: "",
         control_id: "",
         sub_domain: "",
         domain: "",
@@ -107,20 +108,27 @@ const UsersPage = () => {
 
         <div className="absolute bottom-0 left-0 w-full flex justify-center space-x-4 transform translate-y-1/2">
           <CustomCard
-            description="Click on the search bar and type your query"
+            description="Please enter the details of your space IoT device."
             imageSrc="/assets/one.png"
             backgroundColor="bg-almond"
             hoverColor="hover:bg-gray-300"
           />
           <CustomCard
-            description="Select your search option and enter the number of Simulations to be done."
+            description="Based on the control matrix (E.g., CSA Cloud Controls Matrix (CCM)) chosen, evaluate your space IoT device, enter details of the controls and possible risks."
             imageSrc="/assets/Two.png"
             backgroundColor="bg-almond"
             hoverColor="hover:bg-gray-300"
           />
           <CustomCard
-            description="Scroll down to see the result of the Monte Carlo simulation and radar chart."
+            description="Provide Control Implementation Scores (CIS) for each control identified based on your knowledge of implementation maturity in your device. "
             imageSrc="/assets/Three.png"
+            backgroundColor="bg-almond"
+            hoverColor="hover:bg-gray-300"
+          />
+
+          <CustomCard
+            description="Provide the number of Monte Carlo Runs – NB. More runs improve accuracy, uncertainty coverage, stability, and confidence. "
+            imageSrc="/assets/four.png"
             backgroundColor="bg-almond"
             hoverColor="hover:bg-gray-300"
           />
@@ -132,22 +140,6 @@ const UsersPage = () => {
         {/* Static First Row */}
         <div className="flex flex-row items-start justify-center w-full gap-6 border p-4 rounded-lg shadow-md ">
           <CustomInput
-            label="Control ID"
-            width="w-40"
-            height="h-10"
-            hints="Ctrl-Id"
-            Value={rows[0].control_id}
-            onChange={(e) => handleInputChange(0, "control_id", e.target.value)}
-          />
-          <CustomInput
-            label="Sub Domain"
-            width="w-40"
-            height="h-10"
-            hints="eg: Secure wireless"
-            Value={rows[0].sub_domain}
-            onChange={(e) => handleInputChange(0, "sub_domain", e.target.value)}
-          />
-          <CustomInput
             label="Domain"
             width="w-40"
             height="h-10"
@@ -156,7 +148,33 @@ const UsersPage = () => {
             onChange={(e) => handleInputChange(0, "domain", e.target.value)}
           />
           <CustomInput
-            label="Potential Risk"
+            label="Control ID"
+            width="w-40"
+            height="h-10"
+            hints="Ctrl-Id"
+            Value={rows[0].control_id}
+            onChange={(e) => handleInputChange(0, "control_id", e.target.value)}
+          />
+          <CustomInput
+            label="Control Domain"
+            width="w-40"
+            height="h-10"
+            hints="eg: Secure wireless"
+            Value={rows[0].sub_domain}
+            onChange={(e) => handleInputChange(0, "sub_domain", e.target.value)}
+          />
+
+          <CustomInput
+            label="Control"
+            width="w-40"
+            height="h-10"
+            hints="eg: Architect network using ..."
+            Value={rows[0].control}
+            onChange={(e) => handleInputChange(0, "control", e.target.value)}
+          />
+
+          <CustomInput
+            label="Potential Risks"
             width="w-40"
             height="h-10"
             hints="eg: Denial of service"
@@ -166,7 +184,7 @@ const UsersPage = () => {
             }
           />
           <Dropdown
-            label="Initial Control Grading"
+            label="Analyst Control Grading"
             selectedValue={rows[0].initial_control_grading}
             onSelect={(value) =>
               handleInputChange(0, "initial_control_grading", value)
@@ -181,26 +199,6 @@ const UsersPage = () => {
             className="ml-7 flex flex-row items-start justify-center w-full gap-6 border p-4 rounded-lg shadow-md"
           >
             <CustomInput
-              label="Control ID"
-              width="w-40"
-              height="h-10"
-              hints="Ctrl-Id"
-              Value={row.control_id}
-              onChange={(e) =>
-                handleInputChange(index + 1, "control_id", e.target.value)
-              }
-            />
-            <CustomInput
-              label="Sub Domain"
-              width="w-40"
-              height="h-10"
-              hints="eg: Secure wireless"
-              Value={row.sub_domain}
-              onChange={(e) =>
-                handleInputChange(index + 1, "sub_domain", e.target.value)
-              }
-            />
-            <CustomInput
               label="Domain"
               width="w-40"
               height="h-10"
@@ -211,7 +209,39 @@ const UsersPage = () => {
               }
             />
             <CustomInput
-              label="Potential Risk"
+              label="Control ID"
+              width="w-40"
+              height="h-10"
+              hints="Ctrl-Id"
+              Value={row.control_id}
+              onChange={(e) =>
+                handleInputChange(index + 1, "control_id", e.target.value)
+              }
+            />
+            <CustomInput
+              label="Control Domain"
+              width="w-40"
+              height="h-10"
+              hints="eg: Secure wireless"
+              Value={row.sub_domain}
+              onChange={(e) =>
+                handleInputChange(index + 1, "sub_domain", e.target.value)
+              }
+            />
+
+            <CustomInput
+              label="Control"
+              width="w-40"
+              height="h-10"
+              hints="eg: Denial of service"
+              Value={row.control}
+              onChange={(e) =>
+                handleInputChange(index + 1, "control", e.target.value)
+              }
+            />
+
+            <CustomInput
+              label="Potential Risks"
               width="w-40"
               height="h-10"
               hints="eg: Denial of service"
@@ -221,7 +251,7 @@ const UsersPage = () => {
               }
             />
             <Dropdown
-              label="Initial Control Grading"
+              label="Analyst Control Grading"
               selectedValue={row.initial_control_grading}
               onSelect={(value) =>
                 handleInputChange(index + 1, "initial_control_grading", value)
@@ -240,7 +270,7 @@ const UsersPage = () => {
       </div>
       <div className="flex flex-col items-center justify-center">
         <CustomInput
-          label="No. of Monte-Carlo Sim"
+          label="Number of Monte-Carlo Simulations"
           width="w-40"
           height="h-10"
           hints="eg: 1000"
@@ -266,15 +296,6 @@ const UsersPage = () => {
         </button>
       </div>
 
-      {/* Radar Chart 
-        <h5 className="text-xl font-semibold text-gray-600 font-inter mt-4 mb-2">
-          Security Assessment
-        </h5>
-        <div className="w-full h-96 flex flex-row items-center justify-center gap-10 max-w-4xl">
-          <RadarChart />
-          <RadarChart />
-        </div>
-*/}
       {/* Monte Carlo Simulation */}
       <div className="flex flex-col items-center justify-center">
         <h5 className="text-xl font-semibold text-gray-600 font-inter mt-8">
@@ -305,38 +326,61 @@ const UsersPage = () => {
           }
         />
       </div>
+
       {/* Displaying the Radar chart */}
-      <div className="flex flex-col pt-2 items-center justify-center mt-3">
-        <h6 className="text-4xl font-semibold text-slate-800 font-inter mb-1 mt-3">
+      <div className="flex flex-col w-full h-full pt-2 items-center mt-3">
+        {/* Radar Chart Title */}
+        <h6 className="text-2xl font-semibold text-slate-800 font-inter mb-20">
           Radar Chart
         </h6>
-        <div className="w-full h-[500px] flex flex-row items-start justify-start rounded-lg shadow-md p-5 gap-4 mx-1">
-          <RadarChart
-            apiData={
-              (apiResponse ?? {
-                message: "",
-                batch_id: 0,
-                risk_frequencies: {},
-                average_cvss_scores: {},
-                User_entries: [],
-              }) as ApiResponse
-            }
-          />
 
-          <Static_Radar apiData={apiResponse ?? null} />
+        {/* Radar Chart Diagram Section */}
+        <div className="w-full h-[500px] flex flex-row items-center justify-center rounded-lg shadow-md p-5 gap-4 mx-1">
+          <div className="flex flex-col items-center justify-center mt-8">
+            <div className="flex flex-col items-center justify-center mb-4">
+              <h5 className="text-xl font-semibold text-gray-600 font-inter">
+                Initial Security Posture
+                <br />
+                Phase 3: Deterministic Analysis
+              </h5>
+            </div>
+            <Static_Radar apiData={apiResponse ?? null} />
+          </div>
+
+          <div className="flex flex-col items-center justify-center mt-8">
+            <div className="flex flex-col items-center justify-center mb-4">
+              <h5 className="text-xl font-semibold text-gray-600 font-inter">
+                Full Implementation of P-SIRM<sup>2</sup> <br />
+                Phase 4: Probabilistic Analysis
+              </h5>
+            </div>
+            <RadarChart
+              apiData={
+                (apiResponse ?? {
+                  message: "",
+                  batch_id: 0,
+                  risk_frequencies: {},
+                  average_cvss_scores: {},
+                  User_entries: [],
+                }) as ApiResponse
+              }
+            />
+          </div>
+        </div>
+
+        {/* Explanation Text */}
+        <div className="flex flex-row items-start justify-start w-full pl-4">
+          <h6 className="text-sm font-semibold text-gray-600 font-inter mt-4 mb-1">
+            Where BIoT = Space IoT device under evaluation
+            <br /> CIoT = Hypothetically Optimally Secure Space IoT device
+          </h6>
         </div>
       </div>
 
-      <div className="flex flex-row pt-2">
-        <h6 className="text-4xl font-semibold text-slate-800 font-inter mb-1 mt-3">
+      <div className="flex flex-row pt-2 items-center justify-center">
+        <h6 className="text-2xl font-semibold text-slate-800 font-inter mb-1 mt-8 ">
           Risk Assessment
         </h6>
-        {/* <Link
-            href="/users"
-            className="text-slate-800 flex items-center justify-end ml-20 space-x-2"
-          >
-            <IoArrowForward className="text-2xl" />
-          </Link> */}
       </div>
       <div className="h-full w-full relative p-5 rounded-lg">
         <RiskTable
@@ -346,6 +390,7 @@ const UsersPage = () => {
               batch_id: 0,
               risk_frequencies: {},
               average_cvss_scores: {},
+              frobenius_score: 0,
               User_entries: [],
             }
           }

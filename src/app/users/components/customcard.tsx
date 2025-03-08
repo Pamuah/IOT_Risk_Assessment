@@ -29,7 +29,7 @@ const CustomCard: React.FC<CustomCardProps> = ({
 
       {/* Card content */}
       <div className="flex items-center justify-center h-full">
-        <p className="text-base font-medium text-gray-800 font-inter">
+        <p className="text-sm font-normal text-gray-800 font-inter">
           {description}
         </p>
       </div>

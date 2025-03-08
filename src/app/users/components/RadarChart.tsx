@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Chart, ChartOptions } from "chart.js/auto";
 
 interface UserEntry {
@@ -23,15 +23,20 @@ const RadarChart: React.FC<{ apiData: ApiResponse | null }> = ({ apiData }) => {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
-  const chartData =
+  const initialChartData =
     apiData?.User_entries?.map((entry) => ({
       label: entry.control_id,
-      weight: Math.min(4, entry.initial_control_grading), // Ensure it does not exceed 4
+      weight: Math.min(4, entry.initial_control_grading), // Ensure max 4
     })) || [];
 
-  const controlScores = chartData.map((item) => item.weight);
-  const variableScores = chartData.map((item) => Math.min(4, item.weight + 1)); // Ensure max 4
-  const idealSituation = chartData.map(() => 4); // Set all to max (4)
+  // Initialize state with proper data
+  const [updatedScores, setUpdatedScores] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (initialChartData.length > 0) {
+      setUpdatedScores(initialChartData.map((item) => item.weight));
+    }
+  }, [apiData]); // Update when API data arrives
 
   useEffect(() => {
     if (chartRef.current) {
@@ -45,27 +50,24 @@ const RadarChart: React.FC<{ apiData: ApiResponse | null }> = ({ apiData }) => {
         chartInstanceRef.current = new Chart(context, {
           type: "radar",
           data: {
-            labels: chartData.map((item) => item.label),
+            labels: initialChartData.map((item) => item.label),
             datasets: [
               {
-                label: "Ideal Situation",
-                data: idealSituation,
-                //    backgroundColor: "rgba(255, 165, 0, 0.2)",
+                label: "CIoT,C",
+                data: initialChartData.map(() => 4), // Max value
                 borderColor: "rgba(255, 165, 0, 0.5)",
                 borderWidth: 2,
               },
               {
-                label: "Control Score",
-                data: controlScores,
-                //  backgroundColor: "rgba(0, 0, 255, 0.1)",
-                borderColor: "rgba(0, 0, 255, 0.7)",
+                label: "Initial BIoT,B Grading",
+                data: initialChartData.map((item) => item.weight),
+                borderColor: "rgba(0, 165, 0, 0.5)",
                 borderWidth: 2,
               },
               {
-                label: "Variable Score",
-                data: variableScores,
-                //  backgroundColor: "rgba(0, 165, 0, 0.2)",
-                borderColor: "rgba(0, 165, 0, 0.5)",
+                label: "Final P-SIRM2 BIoT",
+                data: updatedScores,
+                borderColor: "rgba(0, 0, 255, 0.5)",
                 borderWidth: 2,
               },
             ],
@@ -74,27 +76,16 @@ const RadarChart: React.FC<{ apiData: ApiResponse | null }> = ({ apiData }) => {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: {
-                position: "top",
-              },
-              tooltip: {
-                enabled: true,
-              },
+              legend: { position: "top" },
+              tooltip: { enabled: true },
             },
             scales: {
               r: {
                 min: 0,
                 max: 4,
-                angleLines: {
-                  color: "rgba(0, 0, 0, 0.2)",
-                },
-                grid: {
-                  color: "rgba(0, 0, 0, 0.1)",
-                },
-                ticks: {
-                  stepSize: 1,
-                  color: "rgba(0, 0, 0, 0.8)",
-                },
+                angleLines: { color: "rgba(0, 0, 0, 0.2)" },
+                grid: { color: "rgba(0, 0, 0, 0.1)" },
+                ticks: { stepSize: 1, color: "rgba(0, 0, 0, 0.8)" },
               },
             },
           } as ChartOptions<"radar">,
@@ -107,11 +98,51 @@ const RadarChart: React.FC<{ apiData: ApiResponse | null }> = ({ apiData }) => {
         chartInstanceRef.current.destroy();
       }
     };
-  }, [chartData]);
+  }, [updatedScores, apiData]); // Ensure updates happen in real time
+
+  // Handle input changes
+  const handleInputChange = (index: number, value: string) => {
+    if (value === "") {
+      // If input is cleared, set it to 0
+      const newScores = [...updatedScores];
+      newScores[index] = 0;
+      setUpdatedScores(newScores);
+    } else {
+      const parsedValue = parseFloat(value);
+      if (!isNaN(parsedValue) && parsedValue >= 0 && parsedValue <= 4) {
+        // Only allow values between 0 and 4
+        const newScores = [...updatedScores];
+        newScores[index] = parsedValue;
+        setUpdatedScores(newScores);
+      }
+    }
+  };
 
   return (
-    <div className="h-[400px] w-[400px] md:h-[500px] md:w-[500px] flex justify-center items-center">
-      <canvas ref={chartRef}></canvas>
+    <div className="flex flex-col items-center space-y-4">
+      <div className="h-[400px] w-[400px] md:h-[500px] md:w-[500px] flex justify-center items-center">
+        <canvas ref={chartRef}></canvas>
+      </div>
+      {initialChartData.length > 0 && (
+        <div className="flex flex-wrap gap-4 items-center justify-center">
+          {initialChartData.map((item, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <label className="text-sm font-semibold text-gray-600">
+                {item.label}:
+              </label>
+              <input
+                type="number"
+                value={updatedScores[index] || 0}
+                onChange={(e) => handleInputChange(index, e.target.value)}
+                className="border px-2 py-1 w-16 text-center"
+                min={0}
+                max={4}
+                step={0.1}
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

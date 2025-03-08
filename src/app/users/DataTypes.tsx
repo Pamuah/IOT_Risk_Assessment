@@ -4,4 +4,5 @@ export interface ControlData {
   domain: string;
   initial_control_grading: number;
   potential_risks: string;
+  control: string;
 }
