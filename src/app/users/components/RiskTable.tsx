@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const options = ["Accept", "Avoid", "Mitigate", "Transfer"];
 
@@ -20,7 +21,8 @@ interface TableResponse {
   batch_id: number;
   risk_frequencies: Record<string, number | null>;
   average_cvss_scores: Record<string, number | null>;
-  frobenius_score?: number;
+  euclidean_score?: number;
+  average_severity_score?: number;
   User_entries?: UserEntry[];
 }
 
@@ -58,35 +60,82 @@ const RiskTable = ({ apiData }: { apiData: TableResponse }) => {
         likelihood:
           apiData.risk_frequencies[entry.potential_risks] ?? "Unknown",
         riskTreatment: "Accept",
-        newControlGrading: "Pending",
+        newControlGrading: entry.initial_control_grading.toString(),
       }));
 
       setTableData(formattedData);
     }
   }, [apiData]);
 
+  // Handle risk treatment selection
   const handleChange = (controlId: string, value: string) => {
     setTableData((prev) =>
       prev.map((row) =>
-        row.controlId === controlId ? { ...row, riskTreatment: value } : row
+        row.controlId === controlId
+          ? {
+              ...row,
+              riskTreatment: value,
+              newControlGrading:
+                value === "Accept" || value === "Transfer"
+                  ? row.initialControlGrading.toString()
+                  : value === "Avoid"
+                  ? "4"
+                  : "Pending", // "Mitigate" case will show input field
+            }
+          : row
       )
     );
+  };
+
+  // Handle input change for "Mitigate"
+  const handleGradingInput = (controlId: string, value: string) => {
+    setTableData((prev) =>
+      prev.map((row) =>
+        row.controlId === controlId ? { ...row, newControlGrading: value } : row
+      )
+    );
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const dataToSend = tableData.map(({ controlId, newControlGrading }) => ({
+        control_id: controlId, // Renamed from controlId
+        treatment_option: parseInt(newControlGrading, 10), // Renamed from newControlGrading
+      }));
+
+      console.log(
+        "Data being sent to API:",
+        JSON.stringify(dataToSend, null, 2)
+      );
+
+      const response = await axios.post(
+        "https://web-production-af645.up.railway.app/api/risk_treatment/",
+        dataToSend
+      );
+
+      console.log("Response:", response.data);
+      alert("Data submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting data:", error);
+      alert("Failed to submit data. Please try again.");
+    }
   };
 
   return (
     <div className="overflow-x-auto p-4">
       <table className="w-full border-collapse border border-slate-900">
         <thead>
-          <tr className="text-center text-sm text-white bg-blue-400">
+          <tr className="text-center text-sm text-white bg-blue-500">
             <th className="border px-1 py-2">Domain</th>
             <th className="border px-1 py-2">Control ID</th>
             <th className="border px-1 py-2">Control Domain</th>
             <th className="border px-1 py-2">Control</th>
             <th className="border px-1 py-2">Potential Risk</th>
             <th className="border px-1 py-2">Analyst Control Grading</th>
+            <th className="border px-1 py-2">PVT Likelihood</th>
             <th className="border px-1 py-2">PVT Impact Score</th>
-            <th className="border px-1 py-2">Risk Likelihood</th>
-            <th className="border px-1 py-2">Frobenius Score</th>
+            <th className="border px-1 py-2">Euclidean Score</th>
+            <th className="border px-1 py-2">Average Severity Score</th>
             <th className="border px-1 py-2">Risk Treatment</th>
             <th className="border px-1 py-2">Treatment Control Grading</th>
           </tr>
@@ -103,19 +152,27 @@ const RiskTable = ({ apiData }: { apiData: TableResponse }) => {
               <td className="border p-2">{row.control}</td>
               <td className="border p-2">{row.potentialRisk}</td>
               <td className="border p-2">{row.initialControlGrading}</td>
-              <td className="border p-2">{row.ctrlImpactScore}</td>
               <td className="border p-2">{row.likelihood}</td>
+              <td className="border p-2">{row.ctrlImpactScore}</td>
 
-              {/* Render Frobenius Score only in the first row and merge across all rows */}
               {index === 0 && (
                 <td
                   className="border p-2 border-r border-slate-900"
                   rowSpan={tableData.length}
                 >
-                  {apiData.frobenius_score ?? 0}
+                  {apiData.euclidean_score ?? 0}
+                </td>
+              )}
+              {index === 0 && (
+                <td
+                  className="border p-2 border-r border-slate-900"
+                  rowSpan={tableData.length}
+                >
+                  {apiData.average_severity_score ?? 0}
                 </td>
               )}
 
+              {/* Risk Treatment Dropdown */}
               <td className="border p-2">
                 <select
                   className="border p-1 rounded bg-slate-600 text-white"
@@ -129,11 +186,38 @@ const RiskTable = ({ apiData }: { apiData: TableResponse }) => {
                   ))}
                 </select>
               </td>
-              <td className="border p-2">{row.newControlGrading}</td>
+
+              {/* Treatment Control Grading - Input field for "Mitigate", otherwise display value */}
+              <td className="border p-2">
+                {row.riskTreatment === "Mitigate" ? (
+                  <input
+                    type="number"
+                    className="border p-1 rounded text-white bg-slate-500"
+                    min={row.initialControlGrading + 1}
+                    value={
+                      row.newControlGrading === "Pending"
+                        ? ""
+                        : row.newControlGrading
+                    }
+                    onChange={(e) =>
+                      handleGradingInput(row.controlId, e.target.value)
+                    }
+                  />
+                ) : (
+                  row.newControlGrading
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <button
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+        onClick={handleSubmit}
+      >
+        Submit Risk Treatment
+      </button>
     </div>
   );
 };

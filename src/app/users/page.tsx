@@ -94,16 +94,12 @@ const UsersPage = () => {
         className="h-[40vh] w-full bg-cover bg-center relative"
         style={{ backgroundImage: `url('/assets/cyber_sec.jpg')` }}
       >
+        {/* Background Overlay */}
+        <div className="absolute inset-0 bg-black opacity-20"></div>
         <div className="absolute top-8 left-0 w-full flex justify-between items-center px-8">
           <h1 className="text-4xl font-semibold text-white font-inter">
             P-SIRM<sup>²</sup>
           </h1>
-          <Link
-            className="text-lg font-semibold text-white underline italic font-inter"
-            href="/device"
-          >
-            Device Spec
-          </Link>
         </div>
 
         <div className="absolute bottom-0 left-0 w-full flex justify-center space-x-4 transform translate-y-1/2">
@@ -134,10 +130,18 @@ const UsersPage = () => {
           />
         </div>
       </div>
-
+      <div className="flex flex-col items-center justify-center mt-24">
+        <Link
+          className="text-lg font-semibold text-blue-500 underline italic font-inter"
+          href="/device"
+        >
+          Device Spec
+        </Link>
+      </div>
       {/* Main content section */}
-      <div className="flex flex-col items-center justify-start flex-grow w-full mt-20">
+      <div className="flex flex-col items-center justify-start flex-grow w-full mt-8">
         {/* Static First Row */}
+
         <div className="flex flex-row items-start justify-center w-full gap-6 border p-4 rounded-lg shadow-md ">
           <CustomInput
             label="Domain"
@@ -268,25 +272,25 @@ const UsersPage = () => {
           </div>
         ))}
       </div>
-      <div className="flex flex-col items-center justify-center">
-        <CustomInput
-          label="Number of Monte-Carlo Simulations"
-          width="w-40"
-          height="h-10"
-          hints="eg: 1000"
-          Value={numSim.toString()}
-          onChange={(e) => setNumSim(Number(e.target.value) || 0)}
-        />
-      </div>
-
-      {/* Add Row Button */}
-      <div className="flex flex-row items-center justify-center gap-3">
+      <div className="flex flex-col items-center justify-center gap-4">
         <button
           onClick={addRow}
           className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 mt-4"
         >
           <AiOutlinePlus size={20} /> Add Row
         </button>
+
+        {/* Removed absolute positioning for better alignment */}
+        <div className="flex flex-col items-center justify-center ml-11">
+          <CustomInput
+            label="Number of Monte-Carlo Simulations"
+            width="w-40"
+            height="h-10"
+            hints="eg: 1000"
+            Value={numSim.toString()}
+            onChange={(e) => setNumSim(Number(e.target.value) || 0)}
+          />
+        </div>
 
         <button
           onClick={handleSubmit}
@@ -303,28 +307,32 @@ const UsersPage = () => {
         </h5>
       </div>
 
-      <div className="w-full h-[500px] flex flex-row items-start justify-start rounded-lg shadow-md p-5 gap-4 mx-4">
-        <BarChart
-          response={
-            apiResponse || {
-              message: "",
-              batch_id: 0,
-              risk_frequencies: {},
-              average_cvss_scores: {},
+      <div className="w-full h-full flex flex-row items-start justify-start rounded-lg shadow-md p-5 gap-4 mx-4 overflow-hidden">
+        <div className="flex-1 ">
+          <BarChart
+            response={
+              apiResponse || {
+                message: "",
+                batch_id: 0,
+                risk_frequencies: {},
+                average_cvss_scores: {},
+              }
             }
-          }
-        />
+          />
+        </div>
 
-        <Cvss_BarChart
-          response={
-            apiResponse || {
-              message: "",
-              batch_id: 0,
-              risk_frequencies: {},
-              average_cvss_scores: {},
+        <div className="flex-1 ">
+          <Cvss_BarChart
+            response={
+              apiResponse || {
+                message: "",
+                batch_id: 0,
+                risk_frequencies: {},
+                average_cvss_scores: {},
+              }
             }
-          }
-        />
+          />
+        </div>
       </div>
 
       {/* Displaying the Radar chart */}
@@ -335,7 +343,7 @@ const UsersPage = () => {
         </h6>
 
         {/* Radar Chart Diagram Section */}
-        <div className="w-full h-[500px] flex flex-row items-center justify-center rounded-lg shadow-md p-5 gap-4 mx-1">
+        <div className="w-full h-full flex flex-row items-center justify-center rounded-lg shadow-md p-5 gap-4 mx-1">
           <div className="flex flex-col items-center justify-center mt-8">
             <div className="flex flex-col items-center justify-center mb-4">
               <h5 className="text-xl font-semibold text-gray-600 font-inter">
@@ -390,7 +398,7 @@ const UsersPage = () => {
               batch_id: 0,
               risk_frequencies: {},
               average_cvss_scores: {},
-              frobenius_score: 0,
+              euclidean_score: 0,
               User_entries: [],
             }
           }
