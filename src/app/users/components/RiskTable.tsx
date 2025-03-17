@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useGlobalContext } from "@/app/GlobalContext/global_data";
 
 const options = ["Accept", "Avoid", "Mitigate", "Transfer"];
 
@@ -35,12 +36,13 @@ interface TableRow {
   initialControlGrading: number;
   ctrlImpactScore: number | string;
   likelihood: number | string;
-  newControlGrading: string;
+  newControlGrading: number;
   riskTreatment: string;
 }
 
 const RiskTable = ({ apiData }: { apiData: TableResponse }) => {
   const [tableData, setTableData] = useState<TableRow[]>([]);
+  const { setData } = useGlobalContext();
 
   useEffect(() => {
     if (apiData && apiData.User_entries) {
@@ -60,7 +62,7 @@ const RiskTable = ({ apiData }: { apiData: TableResponse }) => {
         likelihood:
           apiData.risk_frequencies[entry.potential_risks] ?? "Unknown",
         riskTreatment: "Accept",
-        newControlGrading: entry.initial_control_grading.toString(),
+        newControlGrading: entry.initial_control_grading,
       }));
 
       setTableData(formattedData);
@@ -77,10 +79,10 @@ const RiskTable = ({ apiData }: { apiData: TableResponse }) => {
               riskTreatment: value,
               newControlGrading:
                 value === "Accept" || value === "Transfer"
-                  ? row.initialControlGrading.toString()
+                  ? row.initialControlGrading
                   : value === "Avoid"
-                  ? "4"
-                  : "Pending", // "Mitigate" case will show input field
+                  ? 4
+                  : 0, // You can use 0 or any placeholder for "Pending"
             }
           : row
       )
@@ -89,9 +91,12 @@ const RiskTable = ({ apiData }: { apiData: TableResponse }) => {
 
   // Handle input change for "Mitigate"
   const handleGradingInput = (controlId: string, value: string) => {
+    const numericValue = parseInt(value, 10) || 0; // Convert to number
     setTableData((prev) =>
       prev.map((row) =>
-        row.controlId === controlId ? { ...row, newControlGrading: value } : row
+        row.controlId === controlId
+          ? { ...row, newControlGrading: numericValue }
+          : row
       )
     );
   };
@@ -99,10 +104,10 @@ const RiskTable = ({ apiData }: { apiData: TableResponse }) => {
   const handleSubmit = async () => {
     try {
       const dataToSend = tableData.map(({ controlId, newControlGrading }) => ({
-        control_id: controlId, // Renamed from controlId
-        treatment_option: parseInt(newControlGrading, 10), // Renamed from newControlGrading
+        control_id: controlId,
+        treatment_option: newControlGrading,
       }));
-
+      setData(dataToSend.map((item) => item.treatment_option));
       console.log(
         "Data being sent to API:",
         JSON.stringify(dataToSend, null, 2)
@@ -195,9 +200,7 @@ const RiskTable = ({ apiData }: { apiData: TableResponse }) => {
                     className="border p-1 rounded text-white bg-slate-500"
                     min={row.initialControlGrading + 1}
                     value={
-                      row.newControlGrading === "Pending"
-                        ? ""
-                        : row.newControlGrading
+                      row.newControlGrading === 0 ? "" : row.newControlGrading
                     }
                     onChange={(e) =>
                       handleGradingInput(row.controlId, e.target.value)

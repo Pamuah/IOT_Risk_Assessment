@@ -11,6 +11,7 @@ import RiskTable from "./components/RiskTable";
 import RadarChart from "./components/RadarChart";
 import Static_Radar from "./components/DynamicRadar";
 import Cvss_BarChart from "./components/cvss_Barchart";
+import TreatmentRadar from "./components/TreatedRadar";
 
 interface ApiResponse {
   message: string;
@@ -132,8 +133,10 @@ const UsersPage = () => {
       </div>
       <div className="flex flex-col items-center justify-center mt-24">
         <Link
-          className="text-lg font-semibold text-blue-500 underline italic font-inter"
+          className="text-lg font-semibold text-blue-600 underline italic font-inter"
           href="/device"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           Device Spec
         </Link>
@@ -403,6 +406,13 @@ const UsersPage = () => {
             }
           }
         />
+      </div>
+
+      <div className="flex flex-col pt-2 items-center justify-center mt-8">
+        <h6 className="text-2xl font-semibold text-slate-800 font-inter mb-4">
+          Treated Radar Chart
+        </h6>
+        <TreatmentRadar apiData={apiResponse ?? null} />
       </div>
     </div>
   );
