@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛡️ P-SIRM2 Tool
 
-## Getting Started
+A web-based tool for assessing and visualizing IoT-related risks using real-time data. Built with modern technologies including Next.js, TypeScript, Axios, and Chart.js.
 
-First, run the development server:
+## 🚀 Features
+
+- ✅ Perform IoT risk assessments through an intuitive interface
+- 📈 Interactive charts for visualizing risk levels
+- 🔄 Real-time data fetching using Axios
+- ⚡ Fast and scalable with Next.js and TypeScript
+
+## 🧰 Tech Stack
+
+- **Frontend**: [Next.js](https://nextjs.org/), [TypeScript](https://www.typescriptlang.org/)
+- **Data Fetching**: [Axios](https://axios-http.com/)
+- **Charts**: [Chart.js](https://www.chartjs.org/)
+
+## 🖼️ Screenshots
+
+<!-- Add your screenshots here -->
+![Dashboard Screenshot](./screenshots/dashboard.png)
+
+## 📦 Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/your-username/risk-iot-tool.git
+cd risk-iot-tool
+npm install
+```
+To run the development environment
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Folder Structure
+my-next-app/
+├── public/
+├── src/
+      ├── components
+      ├── GlobalContext
+      ├── ApiServices
+      ├── Users
+      
+├── package.json/
+        
+├── tsconfig.json
+└── next.config.js
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### How It Works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Data is fetched from IoT APIs via the backend
 
-## Learn More
+Risks are calculated and processed in the backend 
 
-To learn more about Next.js, take a look at the following resources:
+The processed data is then retrieved by the frontend with axios
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The frontend with Chart.js displays the processed risk data in an interactive visual format
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+after interactions are made the changed data is made available to the backend for storage 
 
-## Deploy on Vercel
+🤝 Contributing
+Contributions are welcome! Please open an issue or submit a pull request.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+👨‍💻 Author
+Patrick Amuah
+patrickamuah38@gmail.com
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
