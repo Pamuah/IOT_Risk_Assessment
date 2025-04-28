@@ -18,7 +18,11 @@ A web-based tool for assessing and visualizing IoT-related risks using real-time
 ## 🖼️ Screenshots
 
 <!-- Add your screenshots here -->
-![Dashboard Screenshot](./screenshots/dashboard.png)
+![image alt](https://github.com/Pamuah/IOT_Risk_Assessment/blob/master/Screenshot%20(34).png?raw=true)
+![image alt](https://github.com/Pamuah/IOT_Risk_Assessment/blob/master/Screenshot%20(35).png?raw=true)
+![image alt](https://github.com/Pamuah/IOT_Risk_Assessment/blob/master/Screenshot%20(36).png?raw=true)
+![image alt](https://github.com/Pamuah/IOT_Risk_Assessment/blob/master/Screenshot%20(37).png?raw=true)
+![image alt](https://github.com/Pamuah/IOT_Risk_Assessment/blob/master/Screenshot%20(38).png?raw=true)
 
 ## 📦 Installation
 
